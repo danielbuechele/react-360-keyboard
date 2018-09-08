@@ -30,30 +30,39 @@ export default class LetterKeyboard extends React.Component<Props> {
   };
 
   render() {
-    return (this.props.numeric ? NUMERIC_LAYOUT : QWERTY_LAYOUT).map((row, i) => (
-      <KeyboardRow key={i} margin={i === 1 ? 20 : 0}>
-        {i === 2 && (
-          <Key width={65} onClick={this.props.onToggleShift}>
-            <Image
-              source={this.props.shift ? asset('shift-active.png') : asset('shift.png')}
-              style={{width: 40, height: 40, tintColor: '#81D9FD'}}
+    return (this.props.numeric ? NUMERIC_LAYOUT : QWERTY_LAYOUT).map(
+      (row, i) => (
+        <KeyboardRow key={i} margin={i === 1 ? 20 : 0}>
+          {i === 2 && (
+            <Key
+              grow={1.5}
+              onClick={this.props.onToggleShift}
+              icon={
+                this.props.shift
+                  ? asset('shift-active.png')
+                  : asset('shift.png')
+              }
             />
-          </Key>
-        )}
-        {row.map(key => {
-          const letter = this.props.shift ? key.toUpperCase() : key;
-          return (
-            <Key onClick={() => this.props.onType(letter)} key={key}>
-              {letter}
-            </Key>
-          );
-        })}
-        {i === 2 && (
-          <Key onClick={() => this.props.onType('Backspace')} width={65}>
-            <Image source={asset('backspace.png')} style={{width: 40, height: 40, tintColor: '#81D9FD'}} />
-          </Key>
-        )}
-      </KeyboardRow>
-    ));
+          )}
+          {row.map(key => {
+            const letter = this.props.shift ? key.toUpperCase() : key;
+            return (
+              <Key
+                onClick={() => this.props.onType(letter)}
+                key={key}
+                label={letter}
+              />
+            );
+          })}
+          {i === 2 && (
+            <Key
+              onClick={() => this.props.onType('Backspace')}
+              grow={1.5}
+              icon={asset('backspace.png')}
+            />
+          )}
+        </KeyboardRow>
+      ),
+    );
   }
 }

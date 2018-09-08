@@ -10,6 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "prop-types": "^15.6.2",
     "react": "16.0.0",
     "react-360": "~1.0.0",
     "react-360-web": "~1.0.0",

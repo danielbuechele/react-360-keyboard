@@ -1,16 +1,37 @@
 import React from 'react';
-import {AppRegistry, StyleSheet, Text, View, VrButton, NativeModules} from 'react-360';
+import {
+  AppRegistry,
+  StyleSheet,
+  Text,
+  View,
+  VrButton,
+  NativeModules,
+} from 'react-360';
 import {registerKeyboard} from './react-360-keyboard';
 
-export default class Keyboard360 extends React.Component {
+type State = {|
+  name: ?string,
+|};
+
+export default class Keyboard360 extends React.Component<{||}, State> {
+  state = {
+    name: null,
+  };
   onClick = () => {
-    NativeModules.Keyboard.startInput('Enter your name').then(console.log);
+    NativeModules.Keyboard.startInput({
+      initialValue: this.state.name,
+      placeholder: 'Your name',
+      emoji: false,
+    }).then(name => this.setState({name}));
   };
   render() {
+    console.log(NativeModules.Keyboard);
     return (
       <View style={styles.panel}>
         <VrButton style={styles.greetingBox} onClick={this.onClick}>
-          <Text style={styles.greeting}>Welcome to React 360</Text>
+          <Text style={styles.greeting}>
+            {this.state.name || 'Enter your name'}
+          </Text>
         </VrButton>
       </View>
     );

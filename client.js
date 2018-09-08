@@ -2,13 +2,14 @@
 // If you want to modify your application's content, start in "index.js"
 
 import {Math as VRMath, ReactInstance, Surface} from 'react-360-web';
-import Keyboard from './react-360-keyboard/KeyboardModule';
+import KeyboardModule from './react-360-keyboard/KeyboardModule.js';
 
+// console.log(registerKeyboard);
 function init(bundle, parent, options = {}) {
   const r360 = new ReactInstance(bundle, parent, {
     // Add custom options here
     fullScreen: true,
-    nativeModules: [Keyboard],
+    nativeModules: [KeyboardModule.addModule],
     ...options,
   });
 
@@ -20,8 +21,8 @@ function init(bundle, parent, options = {}) {
     r360.getDefaultSurface(),
   );
   r360.compositor.setBackground(r360.getAssetURL('360_world.jpg'));
-  Keyboard(r360);
-  // Load the initial environment
+
+  KeyboardModule.setInstance(r360);
 }
 
 window.React360 = {init};

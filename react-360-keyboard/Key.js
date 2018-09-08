@@ -1,14 +1,37 @@
 import * as React from 'react';
-import {asset, VrButton, Text, StyleSheet, NativeModules} from 'react-360';
+import PropTypes from 'prop-types';
+import {
+  asset,
+  VrButton,
+  Text,
+  StyleSheet,
+  NativeModules,
+  Image,
+} from 'react-360';
 const {AudioModule} = NativeModules;
+
+type Props = {|
+  primary?: boolean,
+  grow?: ?number,
+  label?: string,
+  icon?: string,
+  onClick?: Function,
+  onButtonPress?: Function,
+  onButtonRelease?: Function,
+|};
 
 type State = {
   hover: boolean,
 };
 
 export default class Key extends React.Component<Props, State> {
+  static contextTypes = {
+    tintColor: PropTypes.string,
+  };
+
   static defaultProps = {
-    width: 'auto',
+    primary: false,
+    grow: 1,
   };
 
   state = {
@@ -29,17 +52,20 @@ export default class Key extends React.Component<Props, State> {
   };
 
   render() {
-    const {children, width, ...props} = this.props;
+    const {icon, grow, label, ...props} = this.props;
+    const {tintColor} = this.context;
     return (
       <VrButton
         style={[
           styles.key,
           {
-            width,
-            minWidth: width || 'none',
-            maxWidth: width || 'none',
-            backgroundColor: `rgba(255, 255, 255, ${this.state.hover ? 0.1 : 0.03})`,
-            flexBasis: width !== 'auto' ? 'auto' : 1,
+            backgroundColor: this.props.primary
+              ? tintColor
+              : this.state.hover
+                ? '#3C3D3F'
+                : '#2D2E30',
+            flexBasis: 1,
+            flexGrow: grow,
           },
         ]}
         {...props}
@@ -47,7 +73,26 @@ export default class Key extends React.Component<Props, State> {
         onClick={this.onClick}
         onExit={() => this.setState({hover: false})}
       >
-        {typeof children === 'string' ? <Text style={styles.text}>{children}</Text> : children}
+        {icon && (
+          <Image
+            source={icon}
+            style={{
+              tintColor: this.props.primary ? 'black' : tintColor,
+              width: 40,
+              height: 40,
+            }}
+          />
+        )}
+        {label && (
+          <Text
+            style={[
+              styles.text,
+              {color: this.props.primary ? 'black' : tintColor},
+            ]}
+          >
+            {label}
+          </Text>
+        )}
       </VrButton>
     );
   }
@@ -55,19 +100,18 @@ export default class Key extends React.Component<Props, State> {
 
 const styles = StyleSheet.create({
   key: {
-    flexGrow: 1,
-    flexShrink: 1,
+    flexShrink: 0,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
     margin: 3,
+    padding: 0,
   },
   text: {
     position: 'relative',
     top: -3,
     textAlign: 'center',
     fontSize: 30,
-    color: '#81D9FD',
     fontWeight: '400',
   },
 });

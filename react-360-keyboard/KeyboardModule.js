@@ -1,12 +1,22 @@
-import {Module, Math as VRMath, Surface, ReactInstance} from 'react-360-web';
+import {Module, Math as VRMath, Surface} from 'react-360-web';
 
+import type {ReactInstance} from 'react-360-web';
+import type {Config} from './Keyboard';
 type ResolverID = number;
+type Context = any;
+
+window.SpeechRecognition =
+  window.SpeechRecognition || window.webkitSpeechRecognition;
+window.SpeechGrammarList =
+  window.SpeechGrammarList || window.webkitSpeechGrammarList;
+window.SpeechRecognitionEvent =
+  window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
 
 class KeyboardModule extends Module {
-  constructor(ctx) {
+  constructor(ctx: Context) {
     super('Keyboard');
+    this.dictationAvailable = Boolean(window.SpeechRecognition);
     this._surface = new Surface(700, 350, Surface.SurfaceShape.Flat);
-    this._keyboardVisible = false;
     this._ctx = ctx;
   }
 
@@ -27,23 +37,58 @@ class KeyboardModule extends Module {
 
     // TODO: persist existing frame hooks
     instance._frameHook = this._frameHook.bind(this);
-    instance.renderToSurface(this._instance.createRoot('KeyboardPanel'), this._surface);
+    instance.renderToSurface(
+      this._instance.createRoot('KeyboardPanel'),
+      this._surface,
+    );
   }
 
-  showKeyboard() {}
+  $startDictation(resolveID: ResolverID) {
+    this._dictationResolver = resolveID;
+    this._recognition = new window.SpeechRecognition();
+    // var speechRecognitionList = new window.SpeechGrammarList();
+    // speechRecognitionList.addFromString(grammar, 1);
+    // recognition.grammars = speechRecognitionList;
+    //recognition.continuous = false;
+    this._recognition.lang = 'en-US';
+    this._recognition.interimResults = false;
+    this._recognition.maxAlternatives = 1;
 
-  hideKeyboard() {
-    this._keyboardVisible = false;
+    this._recognition.onresult = event => {
+      console.log(event.results);
+      this._ctx.invokeCallback(resolveID, [event.results[0][0].transcript]);
+    };
+
+    this._recognition.onspeechend = () => {
+      this._recognition.stop();
+    };
+
+    this._recognition.onnomatch = event => {
+      console.log('onnomatch');
+    };
+
+    this._recognition.onerror = event => {
+      console.log('onerror');
+    };
+
+    this._recognition.start();
   }
 
-  $startInput(placeholder: string, resolveID: ResolverID) {
-    this._keyboardVisible = true;
+  $stopDictation() {
+    if (this._recognition) {
+      this._recognition.stop();
+      this._recognition = null;
+    }
+  }
+
+  $startInput(config: Config, resolveID: ResolverID) {
+    if (this._inputResolver) {
+      // keyboard already shown
+      return;
+    }
     this._inputResolver = resolveID;
     if (this._onShowResolver) {
-      this._ctx.invokeCallback(
-        this._onShowResolver,
-        [placeholder], // array of arguments passed to resolve method
-      );
+      this._ctx.invokeCallback(this._onShowResolver, [config]);
     }
   }
 
@@ -61,11 +106,13 @@ class KeyboardModule extends Module {
 }
 
 let module;
-export default input => {
-  if (module && input instanceof ReactInstance) {
-    module._setInstance(input);
-  } else {
-    module = new KeyboardModule(input);
+
+export default {
+  addModule: (ctx: Context) => {
+    module = new KeyboardModule(ctx);
     return module;
-  }
+  },
+  setInstance: (instance: ReactInstance) => {
+    module._setInstance(instance);
+  },
 };

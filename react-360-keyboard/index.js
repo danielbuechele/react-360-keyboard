@@ -1,3 +1,3 @@
-import Keyboard from './Keyboard';
+import KeyboardComponent from './Keyboard';
 
-export const registerKeyboard = ['KeyboardPanel', () => Keyboard];
+export const registerKeyboard = ['KeyboardPanel', () => KeyboardComponent];

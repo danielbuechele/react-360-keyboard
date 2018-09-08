@@ -2,55 +2,91 @@ import * as React from 'react';
 import Key from './Key';
 import KeyboardRow from './KeyboardRow';
 import LetterKeyboard from './LetterKeyboard';
+import Placeholder from './Placeholder';
+import Dictation from './Dictation';
+import PropTypes from 'prop-types';
 import EmojiKeyboard from './EmojiKeyboard';
-import {AppRegistry, StyleSheet, Text, View, Image, asset, NativeModules, Animated} from 'react-360';
+import {
+  AppRegistry,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  asset,
+  NativeModules,
+  Animated,
+} from 'react-360';
 
-type Props = {|
-  sound?: boolean,
+type Props = {||};
+
+type InternalConfig = {|
+  initialValue: ?string,
+  placeholder: ?string,
+  sound: boolean,
   returnKeyLabel?: string,
-  tintColor?: string,
-  onChange?: (value: string) => mixed,
-  onValidate?: (value: string) => boolean,
-  onSubmit?: (value: string) => mixed,
+  tintColor: string,
 |};
 
+export type Config = $Shape<InternalConfig>;
+
 type State = {
+  value: ?string,
   shift: boolean,
   numeric: boolean,
-  typed: string,
+  emoji: boolean,
+  dictation: boolean,
   opacity: Object,
-  placeholder: ?string,
+  config: Config,
 };
 
+const DEFAULT_CONFIG = Object.freeze({
+  initialValue: null,
+  placeholder: null,
+  sound: true,
+  returnKeyLabel: 'Return',
+  tintColor: '#81D9FD',
+});
+
 export default class Keyboard extends React.Component<Props, State> {
-  static defaultProps = {
-    returnKeyLabel: 'Return',
-    tintColor: '#81D9FD',
-    sound: true,
+  static childContextTypes = {
+    tintColor: PropTypes.string,
   };
 
   state = {
-    shift: false,
+    shift: true,
     numeric: false,
-    typed: '',
+    emoji: false,
+    dictation: false,
     opacity: new Animated.Value(0),
-    placeholder: null,
+    value: '',
+    config: {...DEFAULT_CONFIG},
   };
 
   componentDidMount() {
     NativeModules.Keyboard.waitForShow().then(this.onShow);
   }
 
-  onShow = (placeholder: ?string) => {
-    this.setState({placeholder, typed: ''});
+  getChildContext() {
+    return {tintColor: this.state.config.tintColor};
+  }
+
+  onShow = (config: Config) => {
+    this.setState({
+      config: {
+        ...DEFAULT_CONFIG,
+        ...config,
+      },
+      value: config.initialValue,
+      shift: !Boolean(config.initialValue),
+    });
     Animated.timing(this.state.opacity, {
-      toValue: 350,
+      toValue: 1,
       duration: 200,
     }).start();
   };
 
   onSubmit = () => {
-    NativeModules.Keyboard.endInput(this.state.typed).then(() => {
+    NativeModules.Keyboard.endInput(this.state.value).then(() => {
       Animated.timing(this.state.opacity, {
         toValue: 0,
         duration: 200,
@@ -60,25 +96,61 @@ export default class Keyboard extends React.Component<Props, State> {
   };
 
   onType = (letter: string) => {
-    let {typed} = this.state;
+    let {value} = this.state;
+    value = value || '';
+
     if (letter === 'Backspace') {
-      typed = typed.slice(0, -1);
+      value = value.slice(0, -1);
     } else {
-      typed += String(letter);
+      value += String(letter);
     }
 
-    this.setState({typed, shift: false});
-    if (this.props.onChange) {
-      this.props.onChange(typed);
+    this.onChange(value);
+  };
+
+  onChange = (value: ?string) => {
+    if (value && value.length === 0) {
+      value = null;
     }
+    this.setState({value, shift: !Boolean(value)});
+  };
+
+  startDictation = () => {
+    this.setState({
+      dictation: true,
+    });
+    NativeModules.Keyboard.startDictation().then(this.onChange);
+  };
+
+  endDictation = () => {
+    this.setState({
+      dictation: false,
+    });
+    NativeModules.Keyboard.stopDictation();
   };
 
   render() {
+    const tintColor = this.state.config.tintColor;
+
     return (
-      <Animated.View style={{transform: [{translateZ: this.state.opacity}]}}>
-        <View style={styles.placeholder}>
-          <Text style={styles.placeholderText}>{this.state.typed || this.state.placeholder || ' '}</Text>
-        </View>
+      <Animated.View
+        style={{
+          opacity: this.state.opacity,
+          transform: [
+            {
+              translateY: this.state.opacity.interpolate({
+                inputRange: [0, 1],
+                outputRange: [-150, 0],
+              }),
+            },
+          ],
+        }}
+      >
+        <Placeholder
+          typed={this.state.value}
+          placeholder={this.state.config.placeholder}
+          onChange={this.onChange}
+        />
         <View style={styles.keyboard}>
           {this.state.emoji ? (
             <EmojiKeyboard onType={this.onType} />
@@ -91,20 +163,32 @@ export default class Keyboard extends React.Component<Props, State> {
             />
           )}
           <KeyboardRow>
-            <Key width={80} onClick={() => this.setState({numeric: !this.state.numeric})}>
-              {this.state.numeric ? 'ABC' : '123'}
-            </Key>
-            <Key width={80} onClick={() => this.setState({emoji: !this.state.emoji})}>
-              <Image
-                source={asset('emoji.png')}
-                style={{width: 40, height: 40, tintColor: this.props.tintColor}}
+            <Key
+              grow={2}
+              label={this.state.numeric ? 'ABC' : '123'}
+              onClick={() => this.setState({numeric: !this.state.numeric})}
+            />
+            <Key
+              grow={2}
+              onClick={() => this.setState({emoji: !this.state.emoji})}
+              icon={asset('emoji.png')}
+            />
+            <Key grow={6} onClick={() => this.onType(' ')} />
+            {NativeModules.Keyboard.dictationAvailable && (
+              <Key
+                grow={2}
+                onButtonPress={this.startDictation}
+                onButtonRelease={this.endDictation}
+                icon={asset('mic.png')}
               />
-            </Key>
-            <Key width={200} onClick={() => this.onType(' ')} />
-            <Key width={100} onClick={this.onSubmit}>
-              {this.props.returnKeyLabel}
-            </Key>
+            )}
+            <Key
+              grow={3}
+              onClick={this.onSubmit}
+              label={this.state.config.returnKeyLabel}
+            />
           </KeyboardRow>
+          <Dictation />
         </View>
       </Animated.View>
     );
@@ -113,32 +197,15 @@ export default class Keyboard extends React.Component<Props, State> {
 
 const styles = StyleSheet.create({
   keyboard: {
+    zIndex: 100,
     width: 600,
     height: 200,
     backgroundColor: '#262729',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 20,
+    borderRadius: 15,
     padding: 5,
     alignSelf: 'center',
-  },
-  placeholder: {
-    width: 700,
-    height: 60,
-    backgroundColor: '#262729',
-    borderRadius: 30,
-    paddingHorizontal: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-    borderWidth: 2,
-    borderColor: '#81D9FD',
-    //transform: [{rotateX: '-45deg'}],
-  },
-  placeholderText: {
-    color: '#81D9FD',
-    fontWeight: '500',
-    fontSize: 40,
   },
 });
 

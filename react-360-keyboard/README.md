@@ -19,21 +19,28 @@ function init(bundle, parent, options = {}) {
 }
 ```
 
-In your react-360 code you can then call `showKeyboard`:
+In your react-360 code, add the keyboard to the AppRegistry and show it:
 
 ```js
-import {VrButton, NativeModules} from 'react-360';
+import {VrButton, NativeModules, AppRegistry} from 'react-360';
+
+// 3.) register the Keyboard in your AppRegistry
 import {registerKeyboard} from './react-360-keyboard';
+AppRegistry.registerComponent(...registerKeyboard);
 
 export default class MyVRApp extends React.Component {
+  onClick() {
+    // 4.) show the keyboard
+    NativeModules.Keyboard.startInput('Placeholder text').then(input =>
+      console.log(input),
+    );
+  }
   render() {
     return (
-      <VrButton onClick={NativeModules.Keyboard.toggle}>
+      <VrButton onClick={this.onClick}>
         <Text>Show Keyboard</Text>
       </VrButton>
     );
   }
 }
-
-AppRegistry.registerComponent(...registerKeyboard);
 ```

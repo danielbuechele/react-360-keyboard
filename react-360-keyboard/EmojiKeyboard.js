@@ -9,7 +9,10 @@ function emojiUnicode(input) {
   if (input.length === 1) {
     return input.charCodeAt(0);
   }
-  let comp = (input.charCodeAt(0) - 0xd800) * 0x400 + (input.charCodeAt(1) - 0xdc00) + 0x10000;
+  let comp =
+    (input.charCodeAt(0) - 0xd800) * 0x400 +
+    (input.charCodeAt(1) - 0xdc00) +
+    0x10000;
   if (comp < 0) {
     return input.charCodeAt(0);
   }
@@ -27,10 +30,6 @@ export default class EmojiKeyboard extends React.Component<Props> {
         <Image source={asset('emoji/1f604.png')} style={styles.emoji} />
         <Image source={asset('emoji/1f605.png')} style={styles.emoji} />
         <Image source={asset('emoji/1f606.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f607.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f607.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f607.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f607.png')} style={styles.emoji} />
         <Image source={asset('emoji/1f607.png')} style={styles.emoji} />
       </KeyboardRow>,
       <KeyboardRow key="2">
