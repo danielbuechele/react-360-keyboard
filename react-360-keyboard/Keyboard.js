@@ -6,16 +6,8 @@ import Placeholder from './Placeholder';
 import Dictation from './Dictation';
 import PropTypes from 'prop-types';
 import EmojiKeyboard from './EmojiKeyboard';
-import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  asset,
-  NativeModules,
-  Animated,
-} from 'react-360';
+import {AppRegistry, StyleSheet, Text, View, Image, asset, NativeModules, Animated} from 'react-360';
+const {AudioModule} = NativeModules;
 
 type Props = {||};
 
@@ -52,6 +44,7 @@ const DEFAULT_CONFIG = Object.freeze({
 export default class Keyboard extends React.Component<Props, State> {
   static childContextTypes = {
     tintColor: PropTypes.string,
+    sound: PropTypes.bool,
   };
 
   state = {
@@ -67,7 +60,10 @@ export default class Keyboard extends React.Component<Props, State> {
   }
 
   getChildContext() {
-    return {tintColor: this.state.config.tintColor};
+    return {
+      tintColor: this.state.config.tintColor,
+      sound: this.state.config.sound,
+    };
   }
 
   onShow = (config: Config) => {
@@ -128,6 +124,13 @@ export default class Keyboard extends React.Component<Props, State> {
         this.setState({
           mode: 'alphabetic',
         });
+
+        if (this.state.config.sound) {
+          AudioModule.playOneShot({
+            source: asset('react-360-keyboard/Notification-02.m4a'),
+            volume: 0.15,
+          });
+        }
       })
       .catch(() => {
         this.setState({
@@ -175,8 +178,7 @@ export default class Keyboard extends React.Component<Props, State> {
               label={this.state.mode === 'alphabetic' ? '123' : 'ABC'}
               onClick={() =>
                 this.setState({
-                  mode:
-                    this.state.mode === 'alphabetic' ? 'numeric' : 'alphabetic',
+                  mode: this.state.mode === 'alphabetic' ? 'numeric' : 'alphabetic',
                 })
               }
             />
@@ -197,14 +199,11 @@ export default class Keyboard extends React.Component<Props, State> {
                 <Key
                   grow={2}
                   onClick={this.startDictation}
+                  sound={asset('react-360-keyboard/Message-02.m4a')}
                   icon={asset('react-360-keyboard/mic.png')}
                 />
               )}
-            <Key
-              grow={3}
-              onClick={this.onSubmit}
-              label={this.state.config.returnKeyLabel}
-            />
+            <Key grow={3} onClick={this.onSubmit} label={this.state.config.returnKeyLabel} />
           </KeyboardRow>
           <Dictation isVisible={this.state.mode === 'dictation'} />
         </View>

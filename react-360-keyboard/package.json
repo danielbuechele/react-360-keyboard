@@ -22,8 +22,10 @@
   "scripts": {
     "postinstall": "cp -r node_modules/react-360-keyboard/static_assets/ static_assets/react-360-keyboard/"
   },
+  "dependencies": {
+    "prop-types": "^15.6.2"
+  },
   "peerDependencies": {
-    "prop-types": "^15.6.2",
     "react": "16.0.0",
     "react-360": "~1.0.0",
     "react-360-web": "~1.0.0"

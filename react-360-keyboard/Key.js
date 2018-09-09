@@ -1,13 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import {
-  asset,
-  VrButton,
-  Text,
-  StyleSheet,
-  NativeModules,
-  Image,
-} from 'react-360';
+import {asset, VrButton, Text, StyleSheet, NativeModules, Image} from 'react-360';
 const {AudioModule} = NativeModules;
 
 type Props = {|
@@ -15,6 +8,7 @@ type Props = {|
   grow?: ?number,
   label?: string,
   icon?: string,
+  sound?: string,
   onClick?: Function,
   onButtonPress?: Function,
   onButtonRelease?: Function,
@@ -27,6 +21,7 @@ type State = {
 export default class Key extends React.Component<Props, State> {
   static contextTypes = {
     tintColor: PropTypes.string,
+    sound: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -43,10 +38,12 @@ export default class Key extends React.Component<Props, State> {
   };
 
   onButtonPress = () => {
-    AudioModule.playOneShot({
-      source: asset('react-360-keyboard/Click.m4a'),
-      volume: 0.15,
-    });
+    if (this.context.sound) {
+      AudioModule.playOneShot({
+        source: this.props.sound || asset('react-360-keyboard/Click.m4a'),
+        volume: 0.15,
+      });
+    }
     if (this.props.onButtonPress) {
       this.props.onButtonPress();
     }
@@ -61,11 +58,7 @@ export default class Key extends React.Component<Props, State> {
         style={[
           styles.key,
           {
-            backgroundColor: this.props.primary
-              ? tintColor
-              : this.state.hover
-                ? '#3C3D3F'
-                : '#2D2E30',
+            backgroundColor: this.props.primary ? tintColor : this.state.hover ? '#3C3D3F' : '#2D2E30',
             flexGrow: grow,
           },
         ]}
@@ -86,14 +79,7 @@ export default class Key extends React.Component<Props, State> {
           />
         )}
         {label && (
-          <Text
-            style={[
-              styles.text,
-              {color: this.props.primary ? 'black' : tintColor},
-            ]}
-          >
-            {label}
-          </Text>
+          <Text style={[styles.text, {color: this.props.primary ? 'black' : tintColor}]}>{label}</Text>
         )}
       </VrButton>
     );
