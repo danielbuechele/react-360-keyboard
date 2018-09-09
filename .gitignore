@@ -2,5 +2,7 @@
 *~
 *.log
 *.js.meta
-node_modules/
+node_modules/*
+!node_modules/react-360-keyboard/
 build/
+static_assets/react-360-keyboard/

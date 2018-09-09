@@ -1,7 +1,12 @@
 import React from 'react';
-import {AppRegistry, StyleSheet, View, VrButton, NativeModules} from 'react-360';
-import EmojiText from './react-360-keyboard/EmojiText';
-import {registerKeyboard} from './react-360-keyboard';
+import {
+  AppRegistry,
+  StyleSheet,
+  View,
+  VrButton,
+  NativeModules,
+} from 'react-360';
+import {EmojiText, registerKeyboard} from 'react-360-keyboard';
 
 type State = {|
   name: ?string,
@@ -24,7 +29,9 @@ export default class Keyboard360 extends React.Component<{||}, State> {
   render() {
     return (
       <VrButton style={styles.greetingBox} onClick={this.onClick}>
-        <EmojiText style={styles.greeting}>{this.state.name || 'Click to enter your name'}</EmojiText>
+        <EmojiText style={styles.greeting}>
+          {this.state.name || 'Click to enter your name'}
+        </EmojiText>
       </VrButton>
     );
   }
