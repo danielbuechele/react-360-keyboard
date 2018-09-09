@@ -3,8 +3,7 @@ node_js:
   - '10'
 
 script:
-  - git reset --hard
-  - cp -r node_modules/react-360-keyboard/static_assets/ static_assets/react-360-keyboard/
+  - cp -r react-360-keyboard/static_assets/ static_assets/react-360-keyboard/
   - yarn bundle
   - mv static_assets build/static_assets
 

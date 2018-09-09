@@ -1,7 +1,15 @@
 {
-  "name": "react-keyboard-360",
+  "name": "react-360-keyboard",
+  "author": {
+    "name" : "Daniel Büchele",
+    "email" : "daniel@buechele.cc"
+  },
   "version": "1.0.0",
   "main": "index.js",
+  "license": {
+    "type": "MIT",
+    "url": "https://raw.githubusercontent.com/danielbuechele/react-360-keyboard/master/LICENSE"
+  },
   "scripts": {
     "postinstall": "cp -r node_modules/react-360-keyboard/static_assets/ static_assets/react-360-keyboard/"
   },

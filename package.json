@@ -1,13 +1,20 @@
 {
   "name": "Keyboard360",
   "version": "0.0.1",
+  "author": {
+    "name": "Daniel Büchele",
+    "email": "daniel@buechele.cc"
+  },
   "private": true,
+  "license": {
+    "type": "MIT",
+    "url": "https://raw.githubusercontent.com/danielbuechele/react-360-keyboard/master/LICENSE"
+  },
   "scripts": {
     "start": "node -e \"console.log('open browser at http://localhost:8081/index.html\\n\\n');\" && node node_modules/react-native/local-cli/cli.js start",
     "bundle": "node node_modules/react-360/scripts/bundle.js",
     "open": "node -e \"require('xopen')('http://localhost:8081/index.html')\"",
-    "devtools": "react-devtools",
-    "test": "jest"
+    "devtools": "react-devtools"
   },
   "dependencies": {
     "prop-types": "^15.6.2",
@@ -20,7 +27,6 @@
   "devDependencies": {
     "babel-jest": "^19.0.0",
     "babel-preset-react-native": "^1.9.1",
-    "jest": "^19.0.2",
     "prettier": "^1.14.2",
     "react-devtools": "^2.5.2",
     "react-test-renderer": "16.0.0",

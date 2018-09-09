@@ -1,6 +1,13 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import {asset, VrButton, Text, StyleSheet, NativeModules, Image} from 'react-360';
+import {
+  asset,
+  VrButton,
+  Text,
+  StyleSheet,
+  NativeModules,
+  Image,
+} from 'react-360';
 const {AudioModule} = NativeModules;
 
 type Props = {|
@@ -54,7 +61,11 @@ export default class Key extends React.Component<Props, State> {
         style={[
           styles.key,
           {
-            backgroundColor: this.props.primary ? tintColor : this.state.hover ? '#3C3D3F' : '#2D2E30',
+            backgroundColor: this.props.primary
+              ? tintColor
+              : this.state.hover
+                ? '#3C3D3F'
+                : '#2D2E30',
             flexGrow: grow,
           },
         ]}
@@ -75,7 +86,14 @@ export default class Key extends React.Component<Props, State> {
           />
         )}
         {label && (
-          <Text style={[styles.text, {color: this.props.primary ? 'black' : tintColor}]}>{label}</Text>
+          <Text
+            style={[
+              styles.text,
+              {color: this.props.primary ? 'black' : tintColor},
+            ]}
+          >
+            {label}
+          </Text>
         )}
       </VrButton>
     );

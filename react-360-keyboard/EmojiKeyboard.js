@@ -2,7 +2,14 @@ import * as React from 'react';
 import Key from './Key';
 import KeyboardRow from './KeyboardRow';
 import {emojiUnicode} from './EmojiText';
-import {StyleSheet, Image, View, VrButton, NativeModules, asset} from 'react-360';
+import {
+  StyleSheet,
+  Image,
+  View,
+  VrButton,
+  NativeModules,
+  asset,
+} from 'react-360';
 const {AudioModule} = NativeModules;
 
 type Props = {|
@@ -45,7 +52,10 @@ export default class EmojiKeyboard extends React.Component<Props, State> {
           >
             <Image
               source={asset(`react-360-keyboard/emoji/${emojiUnicode(k)}.png`)}
-              style={[styles.emoji, {transform: [{scale: this.state.hover === k ? 1.2 : 1}]}]}
+              style={[
+                styles.emoji,
+                {transform: [{scale: this.state.hover === k ? 1.2 : 1}]},
+              ]}
             />
           </VrButton>
         ))}

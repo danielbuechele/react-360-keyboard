@@ -74,7 +74,10 @@ export default class Dictation extends React.Component<Props, State> {
   render() {
     const {tintColor} = this.context;
     return this.state.isVisible ? (
-      <Animated.View style={[styles.container, {opacity: this.state.opacity}]} pointerEvents={'none'}>
+      <Animated.View
+        style={[styles.container, {opacity: this.state.opacity}]}
+        pointerEvents={'none'}
+      >
         <View style={styles.bars}>
           {this.state.heights.map((height, i) => (
             <Animated.View

@@ -62,7 +62,9 @@ export default class Keyboard extends React.Component<Props, State> {
             style={[
               styles.clearText,
               {
-                tintColor: this.state.hover ? tintColor : 'rgba(255, 255, 255, 0.3)',
+                tintColor: this.state.hover
+                  ? tintColor
+                  : 'rgba(255, 255, 255, 0.3)',
               },
             ]}
           />

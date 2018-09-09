@@ -6,7 +6,16 @@ import Placeholder from './Placeholder';
 import Dictation from './Dictation';
 import PropTypes from 'prop-types';
 import EmojiKeyboard from './EmojiKeyboard';
-import {AppRegistry, StyleSheet, Text, View, Image, asset, NativeModules, Animated} from 'react-360';
+import {
+  AppRegistry,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  asset,
+  NativeModules,
+  Animated,
+} from 'react-360';
 
 type Props = {||};
 
@@ -165,22 +174,37 @@ export default class Keyboard extends React.Component<Props, State> {
               grow={2}
               label={this.state.mode === 'alphabetic' ? '123' : 'ABC'}
               onClick={() =>
-                this.setState({mode: this.state.mode === 'alphabetic' ? 'numeric' : 'alphabetic'})
+                this.setState({
+                  mode:
+                    this.state.mode === 'alphabetic' ? 'numeric' : 'alphabetic',
+                })
               }
             />
             {this.state.config.emoji && (
               <Key
                 grow={2}
-                onClick={() => this.setState({mode: this.state.mode === 'emoji' ? 'alphabetic' : 'emoji'})}
+                onClick={() =>
+                  this.setState({
+                    mode: this.state.mode === 'emoji' ? 'alphabetic' : 'emoji',
+                  })
+                }
                 icon={asset('react-360-keyboard/emoji.png')}
               />
             )}
             <Key grow={6} onClick={() => this.onType(' ')} />
             {this.state.config.dictation &&
               NativeModules.Keyboard.dictationAvailable && (
-                <Key grow={2} onClick={this.startDictation} icon={asset('react-360-keyboard/mic.png')} />
+                <Key
+                  grow={2}
+                  onClick={this.startDictation}
+                  icon={asset('react-360-keyboard/mic.png')}
+                />
               )}
-            <Key grow={3} onClick={this.onSubmit} label={this.state.config.returnKeyLabel} />
+            <Key
+              grow={3}
+              onClick={this.onSubmit}
+              label={this.state.config.returnKeyLabel}
+            />
           </KeyboardRow>
           <Dictation isVisible={this.state.mode === 'dictation'} />
         </View>

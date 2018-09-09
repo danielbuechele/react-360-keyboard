@@ -7,21 +7,21 @@ A react-360 keyboard for VR text input. With emoji-support and dictation for spe
 In your `client.js` file you need to add the NativeModules to your instance and pass the instance to the module.
 
 ```js
-import {Keyboard} from './react-360-keyboard';
+import KeyboardModule from 'react-360-keyboard/KeyboardModule';
 
 function init(bundle, parent, options = {}) {
   const r360 = new ReactInstance(bundle, parent, {
     fullScreen: true,
 
     // 1.) add the NativeModule to your instance
-    nativeModules: [Keyboard],
+    nativeModules: [KeyboardModule.addModule],
 
     ...options,
   });
 
   // 2.) pass the instance to the NativeModule, do this after creating your main
   //     surface to ensure the keyboard is rendered on top of your scene
-  Keyboard(r360);
+  KeyboardModule.setInstance(r360);
 }
 ```
 
@@ -31,7 +31,7 @@ In your react-360 code, add the keyboard to the AppRegistry and show it:
 import {VrButton, NativeModules, AppRegistry} from 'react-360';
 
 // 3.) register the Keyboard in your AppRegistry
-import {registerKeyboard} from './react-360-keyboard';
+import {registerKeyboard} from 'react-360-keyboard';
 AppRegistry.registerComponent(...registerKeyboard);
 
 export default class MyVRApp extends React.Component {

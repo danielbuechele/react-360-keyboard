@@ -6,7 +6,7 @@ import {
   VrButton,
   NativeModules,
 } from 'react-360';
-import {EmojiText, registerKeyboard} from 'react-360-keyboard';
+import {EmojiText, registerKeyboard} from './react-360-keyboard';
 
 type State = {|
   name: ?string,

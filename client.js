@@ -2,9 +2,7 @@
 // If you want to modify your application's content, start in "index.js"
 
 import {Math as VRMath, ReactInstance, Surface} from 'react-360-web';
-import KeyboardModule from 'react-360-keyboard/KeyboardModule';
-
-console.log(KeyboardModule);
+import KeyboardModule from './react-360-keyboard/KeyboardModule';
 
 function init(bundle, parent, options = {}) {
   const r360 = new ReactInstance(bundle, parent, {

@@ -5,9 +5,12 @@ import type {Config} from './Keyboard';
 type ResolverID = number;
 type Context = any;
 
-window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-window.SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
-window.SpeechRecognitionEvent = window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
+window.SpeechRecognition =
+  window.SpeechRecognition || window.webkitSpeechRecognition;
+window.SpeechGrammarList =
+  window.SpeechGrammarList || window.webkitSpeechGrammarList;
+window.SpeechRecognitionEvent =
+  window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
 
 class KeyboardModule extends Module {
   constructor(ctx: Context) {
@@ -34,22 +37,21 @@ class KeyboardModule extends Module {
 
     // TODO: persist existing frame hooks
     instance._frameHook = this._frameHook.bind(this);
-    instance.renderToSurface(this._instance.createRoot('KeyboardPanel'), this._surface);
+    instance.renderToSurface(
+      this._instance.createRoot('KeyboardPanel'),
+      this._surface,
+    );
   }
 
   $startDictation(resolveID: ResolverID, rejectID: ResolverID) {
     this._dictationResolver = resolveID;
+    this._dictationRejecter = rejectID;
     this._recognition = new window.SpeechRecognition();
-    // var speechRecognitionList = new window.SpeechGrammarList();
-    // speechRecognitionList.addFromString(grammar, 1);
-    // recognition.grammars = speechRecognitionList;
-    //recognition.continuous = false;
     this._recognition.lang = 'en-US';
     this._recognition.interimResults = false;
     this._recognition.maxAlternatives = 1;
 
     this._recognition.onresult = event => {
-      console.log(event.results);
       this._ctx.invokeCallback(resolveID, [event.results[0][0].transcript]);
     };
 
@@ -74,6 +76,10 @@ class KeyboardModule extends Module {
     if (this._recognition) {
       this._recognition.stop();
       this._recognition = null;
+    }
+    if (this._dictationRejecter) {
+      this._ctx.invokeCallback(this._dictationRejecter, []);
+      this._dictationRejecter = null;
     }
   }
 
