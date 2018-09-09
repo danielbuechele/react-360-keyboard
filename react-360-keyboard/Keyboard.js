@@ -6,16 +6,7 @@ import Placeholder from './Placeholder';
 import Dictation from './Dictation';
 import PropTypes from 'prop-types';
 import EmojiKeyboard from './EmojiKeyboard';
-import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  asset,
-  NativeModules,
-  Animated,
-} from 'react-360';
+import {AppRegistry, StyleSheet, Text, View, Image, asset, NativeModules, Animated} from 'react-360';
 
 type Props = {||};
 
@@ -23,6 +14,8 @@ type InternalConfig = {|
   initialValue: ?string,
   placeholder: ?string,
   sound: boolean,
+  emoji: boolean,
+  dictation: boolean,
   returnKeyLabel?: string,
   tintColor: string,
 |};
@@ -32,9 +25,7 @@ export type Config = $Shape<InternalConfig>;
 type State = {
   value: ?string,
   shift: boolean,
-  numeric: boolean,
-  emoji: boolean,
-  dictation: boolean,
+  mode: 'alphabetic' | 'numeric' | 'emoji' | 'dictation',
   opacity: Object,
   config: Config,
 };
@@ -43,6 +34,8 @@ const DEFAULT_CONFIG = Object.freeze({
   initialValue: null,
   placeholder: null,
   sound: true,
+  emoji: true,
+  dictation: true,
   returnKeyLabel: 'Return',
   tintColor: '#81D9FD',
 });
@@ -54,9 +47,7 @@ export default class Keyboard extends React.Component<Props, State> {
 
   state = {
     shift: true,
-    numeric: false,
-    emoji: false,
-    dictation: false,
+    mode: 'alphabetic',
     opacity: new Animated.Value(0),
     value: '',
     config: {...DEFAULT_CONFIG},
@@ -76,6 +67,7 @@ export default class Keyboard extends React.Component<Props, State> {
         ...DEFAULT_CONFIG,
         ...config,
       },
+      mode: 'alphabetic',
       value: config.initialValue,
       shift: !Boolean(config.initialValue),
     });
@@ -100,7 +92,9 @@ export default class Keyboard extends React.Component<Props, State> {
     value = value || '';
 
     if (letter === 'Backspace') {
-      value = value.slice(0, -1);
+      value = Array.from(value)
+        .slice(0, -1)
+        .join('');
     } else {
       value += String(letter);
     }
@@ -117,16 +111,20 @@ export default class Keyboard extends React.Component<Props, State> {
 
   startDictation = () => {
     this.setState({
-      dictation: true,
+      mode: 'dictation',
     });
-    NativeModules.Keyboard.startDictation().then(this.onChange);
-  };
-
-  endDictation = () => {
-    this.setState({
-      dictation: false,
-    });
-    NativeModules.Keyboard.stopDictation();
+    NativeModules.Keyboard.startDictation()
+      .then(result => {
+        this.onChange(result);
+        this.setState({
+          mode: 'alphabetic',
+        });
+      })
+      .catch(() => {
+        this.setState({
+          mode: 'alphabetic',
+        });
+      });
   };
 
   render() {
@@ -152,11 +150,11 @@ export default class Keyboard extends React.Component<Props, State> {
           onChange={this.onChange}
         />
         <View style={styles.keyboard}>
-          {this.state.emoji ? (
+          {this.state.mode === 'emoji' ? (
             <EmojiKeyboard onType={this.onType} />
           ) : (
             <LetterKeyboard
-              numeric={this.state.numeric}
+              numeric={this.state.mode === 'numeric'}
               onType={this.onType}
               shift={this.state.shift}
               onToggleShift={() => this.setState({shift: !this.state.shift})}
@@ -165,30 +163,26 @@ export default class Keyboard extends React.Component<Props, State> {
           <KeyboardRow>
             <Key
               grow={2}
-              label={this.state.numeric ? 'ABC' : '123'}
-              onClick={() => this.setState({numeric: !this.state.numeric})}
+              label={this.state.mode === 'alphabetic' ? '123' : 'ABC'}
+              onClick={() =>
+                this.setState({mode: this.state.mode === 'alphabetic' ? 'numeric' : 'alphabetic'})
+              }
             />
-            <Key
-              grow={2}
-              onClick={() => this.setState({emoji: !this.state.emoji})}
-              icon={asset('emoji.png')}
-            />
-            <Key grow={6} onClick={() => this.onType(' ')} />
-            {NativeModules.Keyboard.dictationAvailable && (
+            {this.state.config.emoji && (
               <Key
                 grow={2}
-                onButtonPress={this.startDictation}
-                onButtonRelease={this.endDictation}
-                icon={asset('mic.png')}
+                onClick={() => this.setState({mode: this.state.mode === 'emoji' ? 'alphabetic' : 'emoji'})}
+                icon={asset('react-360-keyboard/emoji.png')}
               />
             )}
-            <Key
-              grow={3}
-              onClick={this.onSubmit}
-              label={this.state.config.returnKeyLabel}
-            />
+            <Key grow={6} onClick={() => this.onType(' ')} />
+            {this.state.config.dictation &&
+              NativeModules.Keyboard.dictationAvailable && (
+                <Key grow={2} onClick={this.startDictation} icon={asset('react-360-keyboard/mic.png')} />
+              )}
+            <Key grow={3} onClick={this.onSubmit} label={this.state.config.returnKeyLabel} />
           </KeyboardRow>
-          <Dictation />
+          <Dictation isVisible={this.state.mode === 'dictation'} />
         </View>
       </Animated.View>
     );

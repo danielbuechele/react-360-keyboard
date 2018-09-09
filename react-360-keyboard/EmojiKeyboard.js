@@ -1,58 +1,56 @@
 import * as React from 'react';
 import Key from './Key';
 import KeyboardRow from './KeyboardRow';
-import {StyleSheet, Image, View, asset} from 'react-360';
+import {emojiUnicode} from './EmojiText';
+import {StyleSheet, Image, View, VrButton, NativeModules, asset} from 'react-360';
+const {AudioModule} = NativeModules;
 
-type Props = {};
+type Props = {|
+  onType: (letter: string) => mixed,
+|};
 
-function emojiUnicode(input) {
-  if (input.length === 1) {
-    return input.charCodeAt(0);
-  }
-  let comp =
-    (input.charCodeAt(0) - 0xd800) * 0x400 +
-    (input.charCodeAt(1) - 0xdc00) +
-    0x10000;
-  if (comp < 0) {
-    return input.charCodeAt(0);
-  }
-  return comp.toString('16');
-}
+type State = {|
+  hover: ?string,
+|};
+//,
+const EMOJI_LAYOUT = [
+  ['😀', '😅', '😂', '😇', '😍', '😘', '😛', '😎', '😟', '😑'],
+  ['😢', '😭', '😡', '😱', '😬', '😴', '👻', '😈', '💩', '🙈'],
+  ['👏', '👍', '👎', '🎉', '🌈', '🔥', '🌟', '🍔', '🚗', '💙'],
+];
 
-export default class EmojiKeyboard extends React.Component<Props> {
+export default class EmojiKeyboard extends React.Component<Props, State> {
+  state = {
+    hover: null,
+  };
+
+  onButtonPress = () => {
+    AudioModule.playOneShot({
+      source: asset('react-360-keyboard/Click.m4a'),
+      volume: 0.15,
+    });
+  };
+
   render() {
-    return [
-      <KeyboardRow key="1">
-        <Image source={asset('emoji/1f600.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f601.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f602.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f603.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f604.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f605.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f606.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f607.png')} style={styles.emoji} />
-      </KeyboardRow>,
-      <KeyboardRow key="2">
-        <Image source={asset('emoji/1f608.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f609.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f610.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f611.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f612.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f613.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f614.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f615.png')} style={styles.emoji} />
-      </KeyboardRow>,
-      <KeyboardRow key="3">
-        <Image source={asset('emoji/1f616.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f617.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f618.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f619.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f620.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f621.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f622.png')} style={styles.emoji} />
-        <Image source={asset('emoji/1f623.png')} style={styles.emoji} />
-      </KeyboardRow>,
-    ];
+    return EMOJI_LAYOUT.map((row, i) => (
+      <KeyboardRow key={`row${i}`}>
+        {row.map((k, i) => (
+          <VrButton
+            hitSlop={10}
+            key={i}
+            onClick={() => this.props.onType(k)}
+            onButtonPress={this.onButtonPress}
+            onEnter={() => this.setState({hover: k})}
+            onExit={() => this.setState({hover: null})}
+          >
+            <Image
+              source={asset(`react-360-keyboard/emoji/${emojiUnicode(k)}.png`)}
+              style={[styles.emoji, {transform: [{scale: this.state.hover === k ? 1.2 : 1}]}]}
+            />
+          </VrButton>
+        ))}
+      </KeyboardRow>
+    ));
   }
 }
 
@@ -67,7 +65,7 @@ const styles = StyleSheet.create({
   emoji: {
     marginLeft: 10,
     marginRight: 10,
-    width: 40,
-    height: 40,
+    width: 36,
+    height: 36,
   },
 });

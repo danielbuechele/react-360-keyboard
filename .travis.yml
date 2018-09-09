@@ -1,0 +1,14 @@
+language: node_js
+
+script:
+  - yarn bundle
+  - mv static_assets build/static_assets
+
+deploy:
+  local-dir: build
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN
+  keep-history: true
+  on:
+    branch: master

@@ -39,8 +39,8 @@ export default class LetterKeyboard extends React.Component<Props> {
               onClick={this.props.onToggleShift}
               icon={
                 this.props.shift
-                  ? asset('shift-active.png')
-                  : asset('shift.png')
+                  ? asset('react-360-keyboard/shift-active.png')
+                  : asset('react-360-keyboard/shift.png')
               }
             />
           )}
@@ -58,7 +58,7 @@ export default class LetterKeyboard extends React.Component<Props> {
             <Key
               onClick={() => this.props.onType('Backspace')}
               grow={1.5}
-              icon={asset('backspace.png')}
+              icon={asset('react-360-keyboard/backspace.png')}
             />
           )}
         </KeyboardRow>

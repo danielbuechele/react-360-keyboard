@@ -1,13 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import {
-  asset,
-  VrButton,
-  Text,
-  StyleSheet,
-  NativeModules,
-  Image,
-} from 'react-360';
+import {asset, VrButton, Text, StyleSheet, NativeModules, Image} from 'react-360';
 const {AudioModule} = NativeModules;
 
 type Props = {|
@@ -42,12 +35,13 @@ export default class Key extends React.Component<Props, State> {
     this.setState({hover: true});
   };
 
-  onClick = () => {
+  onButtonPress = () => {
     AudioModule.playOneShot({
-      source: asset('Click.m4a'),
+      source: asset('react-360-keyboard/Click.m4a'),
+      volume: 0.15,
     });
-    if (this.props.onClick) {
-      this.props.onClick();
+    if (this.props.onButtonPress) {
+      this.props.onButtonPress();
     }
   };
 
@@ -56,21 +50,18 @@ export default class Key extends React.Component<Props, State> {
     const {tintColor} = this.context;
     return (
       <VrButton
+        hitSlop={3}
         style={[
           styles.key,
           {
-            backgroundColor: this.props.primary
-              ? tintColor
-              : this.state.hover
-                ? '#3C3D3F'
-                : '#2D2E30',
-            flexBasis: 1,
+            backgroundColor: this.props.primary ? tintColor : this.state.hover ? '#3C3D3F' : '#2D2E30',
             flexGrow: grow,
           },
         ]}
         {...props}
         onEnter={this.onEnter}
-        onClick={this.onClick}
+        onClick={this.props.onClick}
+        onButtonPress={this.onButtonPress}
         onExit={() => this.setState({hover: false})}
       >
         {icon && (
@@ -84,14 +75,7 @@ export default class Key extends React.Component<Props, State> {
           />
         )}
         {label && (
-          <Text
-            style={[
-              styles.text,
-              {color: this.props.primary ? 'black' : tintColor},
-            ]}
-          >
-            {label}
-          </Text>
+          <Text style={[styles.text, {color: this.props.primary ? 'black' : tintColor}]}>{label}</Text>
         )}
       </VrButton>
     );
@@ -100,6 +84,7 @@ export default class Key extends React.Component<Props, State> {
 
 const styles = StyleSheet.create({
   key: {
+    flexBasis: 1,
     flexShrink: 0,
     justifyContent: 'center',
     alignItems: 'center',

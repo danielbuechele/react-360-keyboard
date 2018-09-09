@@ -1,5 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import EmojiText from './EmojiText';
 import {StyleSheet, VrButton, Text, View, Image, asset} from 'react-360';
 
 type Props = {|
@@ -24,19 +25,28 @@ export default class Keyboard extends React.Component<Props, State> {
   render() {
     const {tintColor} = this.context;
     return (
-      <View style={styles.placeholder}>
-        <Text
+      <View
+        style={[
+          styles.placeholder,
+          {
+            borderColor: tintColor,
+          },
+        ]}
+      >
+        <EmojiText
           style={[
             styles.placeholderText,
             {
+              color: tintColor,
               opacity: this.props.typed ? 1 : 0.3,
               fontWeight: this.props.typed ? '500' : '300',
             },
           ]}
         >
           {this.props.typed || this.props.placeholder || ''}
-        </Text>
+        </EmojiText>
         <VrButton
+          hitSlop={10}
           onEnter={() => this.setState({hover: true})}
           onExit={() => this.setState({hover: false})}
           style={[
@@ -48,13 +58,11 @@ export default class Keyboard extends React.Component<Props, State> {
           onClick={() => this.props.onChange(null)}
         >
           <Image
-            source={asset('x.png')}
+            source={asset('react-360-keyboard/x.png')}
             style={[
               styles.clearText,
               {
-                tintColor: this.state.hover
-                  ? tintColor
-                  : 'rgba(255, 255, 255, 0.3)',
+                tintColor: this.state.hover ? tintColor : 'rgba(255, 255, 255, 0.3)',
               },
             ]}
           />
@@ -74,13 +82,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
     borderWidth: 2,
-    borderColor: '#81D9FD',
     flexDirection: 'row',
   },
   placeholderText: {
-    color: '#81D9FD',
     fontSize: 40,
-    marginBottom: 7,
+    alignSelf: 'flex-start',
     flexGrow: 1,
     textAlign: 'center',
     marginLeft: 20,

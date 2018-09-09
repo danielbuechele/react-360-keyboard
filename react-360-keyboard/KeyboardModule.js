@@ -5,12 +5,9 @@ import type {Config} from './Keyboard';
 type ResolverID = number;
 type Context = any;
 
-window.SpeechRecognition =
-  window.SpeechRecognition || window.webkitSpeechRecognition;
-window.SpeechGrammarList =
-  window.SpeechGrammarList || window.webkitSpeechGrammarList;
-window.SpeechRecognitionEvent =
-  window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
+window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+window.SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
+window.SpeechRecognitionEvent = window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
 
 class KeyboardModule extends Module {
   constructor(ctx: Context) {
@@ -37,13 +34,10 @@ class KeyboardModule extends Module {
 
     // TODO: persist existing frame hooks
     instance._frameHook = this._frameHook.bind(this);
-    instance.renderToSurface(
-      this._instance.createRoot('KeyboardPanel'),
-      this._surface,
-    );
+    instance.renderToSurface(this._instance.createRoot('KeyboardPanel'), this._surface);
   }
 
-  $startDictation(resolveID: ResolverID) {
+  $startDictation(resolveID: ResolverID, rejectID: ResolverID) {
     this._dictationResolver = resolveID;
     this._recognition = new window.SpeechRecognition();
     // var speechRecognitionList = new window.SpeechGrammarList();
@@ -64,11 +58,13 @@ class KeyboardModule extends Module {
     };
 
     this._recognition.onnomatch = event => {
-      console.log('onnomatch');
+      console.log('onnomatch', event);
+      this._ctx.invokeCallback(rejectID, []);
     };
 
     this._recognition.onerror = event => {
-      console.log('onerror');
+      this._ctx.invokeCallback(rejectID, []);
+      console.log('onerror', event);
     };
 
     this._recognition.start();
