@@ -7,7 +7,6 @@
     "bundle": "node node_modules/react-360/scripts/bundle.js",
     "open": "node -e \"require('xopen')('http://localhost:8081/index.html')\"",
     "devtools": "react-devtools",
-    "postinstall": "cp -r node_modules/react-360-keyboard/static_assets/ static_assets/react-360-keyboard/",
     "test": "jest"
   },
   "dependencies": {
