@@ -21,7 +21,7 @@ class KeyboardModule extends Module {
   }
 
   _frameHook() {
-    const cameraDirection = [0, -0.41, -1];
+    const cameraDirection = [0, -0.38, -1];
     const cameraQuat = this._instance.getCameraQuaternion();
     VRMath.rotateByQuaternion(cameraDirection, cameraQuat);
     const cx = cameraDirection[0];
@@ -30,6 +30,8 @@ class KeyboardModule extends Module {
     const horizAngle = Math.atan2(cx, -cz);
     const vertAngle = Math.asin(cy / Math.sqrt(cx * cx + cy * cy + cz * cz));
     this._surface.setAngle(horizAngle, vertAngle);
+    this._surface.setRadius(3.5);
+    this._surface.setVisibility(Boolean(this._inputResolver));
   }
 
   _setInstance(instance: ReactInstance) {
