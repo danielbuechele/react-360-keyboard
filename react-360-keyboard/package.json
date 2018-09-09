@@ -1,9 +1,18 @@
 {
   "name": "react-360-keyboard",
   "author": {
-    "name" : "Daniel Büchele",
-    "email" : "daniel@buechele.cc"
+    "name": "Daniel Büchele",
+    "email": "daniel@buechele.cc"
   },
+  "keywords": [
+    "react-360",
+    "react-vr",
+    "vr",
+    "keyboard",
+    "react",
+    "emoji",
+    "dictation"
+  ],
   "version": "1.0.0",
   "main": "index.js",
   "license": {
