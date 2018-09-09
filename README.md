@@ -2,6 +2,8 @@
 
 A react-360 keyboard for VR text input. With emoji-support and dictation for speech input.
 
+![alt text](https://raw.githubusercontent.com/danielbuechele/react-360-keyboard/master/demo.gif)
+
 Because react-360 itself doesn't offer any text inputs, I created this keyboard. The keyboard can be triggered via a [NativeModule](https://facebook.github.io/react-360/docs/native-modules.html) and is shown on a flat surface that is added on top of the scene. The user can type using any controller supported by `<VrButton>`. Emoji input is possible using [twemoji](https://github.com/twitter/twemoji). In browsers supporting the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API) dictation allows the user to enter the text via speech.
 
 ## Try

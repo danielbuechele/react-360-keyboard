@@ -5,12 +5,9 @@ import type {Config} from './Keyboard';
 type ResolverID = number;
 type Context = any;
 
-window.SpeechRecognition =
-  window.SpeechRecognition || window.webkitSpeechRecognition;
-window.SpeechGrammarList =
-  window.SpeechGrammarList || window.webkitSpeechGrammarList;
-window.SpeechRecognitionEvent =
-  window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
+window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+window.SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
+window.SpeechRecognitionEvent = window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
 
 class KeyboardModule extends Module {
   constructor(ctx: Context) {
@@ -39,10 +36,7 @@ class KeyboardModule extends Module {
 
     // TODO: persist existing frame hooks
     instance._frameHook = this._frameHook.bind(this);
-    instance.renderToSurface(
-      this._instance.createRoot('KeyboardPanel'),
-      this._surface,
-    );
+    instance.renderToSurface(this._instance.createRoot('KeyboardPanel'), this._surface);
   }
 
   $startDictation(resolveID: ResolverID, rejectID: ResolverID) {
@@ -100,7 +94,9 @@ class KeyboardModule extends Module {
     this._ctx.invokeCallback(resolveID, []);
     if (this._inputResolver) {
       this._ctx.invokeCallback(this._inputResolver, [value]);
-      this._inputResolver = null;
+      setTimeout(() => {
+        this._inputResolver = null;
+      }, 200);
     }
   }
 
