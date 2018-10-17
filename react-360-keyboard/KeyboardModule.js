@@ -1,4 +1,4 @@
-import {Module, Math as VRMath, Surface} from 'react-360-web';
+import {Module, Surface} from 'react-360-web';
 
 import type {ReactInstance} from 'react-360-web';
 import type {Config} from './Keyboard';
@@ -18,15 +18,7 @@ class KeyboardModule extends Module {
   }
 
   _frameHook() {
-    const cameraDirection = [0, -0.38, -1];
-    const cameraQuat = this._instance.getCameraQuaternion();
-    VRMath.rotateByQuaternion(cameraDirection, cameraQuat);
-    const cx = cameraDirection[0];
-    const cy = cameraDirection[1];
-    const cz = cameraDirection[2];
-    const horizAngle = Math.atan2(cx, -cz);
-    const vertAngle = Math.asin(cy / Math.sqrt(cx * cx + cy * cy + cz * cz));
-    this._surface.setAngle(horizAngle, vertAngle);
+    this._surface.setAngle(0, -0.36);
     this._surface.setRadius(3.5);
     this._surface.setVisibility(Boolean(this._inputResolver));
   }
