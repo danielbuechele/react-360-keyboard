@@ -5,38 +5,30 @@ import type {Config} from './Keyboard';
 type ResolverID = number;
 type Context = any;
 
-window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-window.SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
-window.SpeechRecognitionEvent = window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
+window.SpeechRecognition =
+  window.SpeechRecognition || window.webkitSpeechRecognition;
+window.SpeechGrammarList =
+  window.SpeechGrammarList || window.webkitSpeechGrammarList;
+window.SpeechRecognitionEvent =
+  window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
 
 class KeyboardModule extends Module {
   constructor(ctx: Context) {
     super('Keyboard');
     this.dictationAvailable = Boolean(window.SpeechRecognition);
     this._surface = new Surface(700, 350, Surface.SurfaceShape.Flat);
-    this._ctx = ctx;
-  }
-
-  _frameHook() {
-    const cameraDirection = [0, -0.38, -1];
-    const cameraQuat = this._instance.getCameraQuaternion();
-    VRMath.rotateByQuaternion(cameraDirection, cameraQuat);
-    const cx = cameraDirection[0];
-    const cy = cameraDirection[1];
-    const cz = cameraDirection[2];
-    const horizAngle = Math.atan2(cx, -cz);
-    const vertAngle = Math.asin(cy / Math.sqrt(cx * cx + cy * cy + cz * cz));
-    this._surface.setAngle(horizAngle, vertAngle);
+    this._surface.setVisibility(false);
     this._surface.setRadius(3.5);
-    this._surface.setVisibility(Boolean(this._inputResolver));
+    this._ctx = ctx;
   }
 
   _setInstance(instance: ReactInstance) {
     this._instance = instance;
 
-    // TODO: persist existing frame hooks
-    instance._frameHook = this._frameHook.bind(this);
-    instance.renderToSurface(this._instance.createRoot('KeyboardPanel'), this._surface);
+    instance.renderToSurface(
+      this._instance.createRoot('KeyboardPanel'),
+      this._surface,
+    );
   }
 
   $startDictation(resolveID: ResolverID, rejectID: ResolverID) {
@@ -85,6 +77,18 @@ class KeyboardModule extends Module {
       return;
     }
     this._inputResolver = resolveID;
+
+    const cameraDirection = [0, -0.1, -1];
+    const cameraQuat = this._instance.getCameraQuaternion();
+    VRMath.rotateByQuaternion(cameraDirection, cameraQuat);
+    const cx = cameraDirection[0];
+    const cy = cameraDirection[1];
+    const cz = cameraDirection[2];
+    const horizAngle = Math.atan2(cx, -cz);
+    const vertAngle = Math.asin(cy / Math.sqrt(cx * cx + cy * cy + cz * cz));
+    this._surface.setAngle(horizAngle, vertAngle);
+    this._surface.setVisibility(true);
+
     if (this._onShowResolver) {
       this._ctx.invokeCallback(this._onShowResolver, [config]);
     }
@@ -92,6 +96,8 @@ class KeyboardModule extends Module {
 
   $endInput(value: string, resolveID: ResolverID) {
     this._ctx.invokeCallback(resolveID, []);
+    this._surface.setVisibility(false);
+
     if (this._inputResolver) {
       this._ctx.invokeCallback(this._inputResolver, [value]);
       setTimeout(() => {
