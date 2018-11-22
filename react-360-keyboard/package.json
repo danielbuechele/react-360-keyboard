@@ -13,7 +13,7 @@
     "emoji",
     "dictation"
   ],
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "index.js",
   "license": {
     "type": "MIT",
@@ -26,8 +26,8 @@
     "prop-types": "^15.6.2"
   },
   "peerDependencies": {
-    "react": "16.0.0",
-    "react-360": "~1.0.0",
-    "react-360-web": "~1.0.0"
+    "react": "16.x",
+    "react-360": "1.x",
+    "react-360-web": "1.x"
   }
 }
