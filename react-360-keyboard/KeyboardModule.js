@@ -1,4 +1,4 @@
-import {Module, Math as VRMath, Surface} from 'react-360-web';
+import {Module, Surface} from 'react-360-web';
 
 import type {ReactInstance} from 'react-360-web';
 import type {Config} from './Keyboard';
@@ -71,6 +71,35 @@ class KeyboardModule extends Module {
     }
   }
 
+  rotateByQuaternion(v: Vec3, q: Quaternion) {
+    // Optimized implementation of Hamiltonian product, similar to Unity's
+    // internal implementation
+    const qx = q[0];
+    const qy = q[1];
+    const qz = q[2];
+    const qw = q[3];
+    const vx = v[0];
+    const vy = v[1];
+    const vz = v[2];
+    const qx2 = qx + qx;
+    const qy2 = qy + qy;
+    const qz2 = qz + qz;
+
+    const xx2 = qx * qx2;
+    const yy2 = qy * qy2;
+    const zz2 = qz * qz2;
+    const xy2 = qx * qy2;
+    const xz2 = qx * qz2;
+    const yz2 = qy * qz2;
+    const wx2 = qw * qx2;
+    const wy2 = qw * qy2;
+    const wz2 = qw * qz2;
+
+    v[0] = (1 - yy2 - zz2) * vx + (xy2 - wz2) * vy + (xz2 + wy2) * vz;
+    v[1] = (xy2 + wz2) * vx + (1 - xx2 - zz2) * vy + (yz2 - wx2) * vz;
+    v[2] = (xz2 - wy2) * vx + (yz2 + wx2) * vy + (1 - xx2 - yy2) * vz;
+  }
+
   $startInput(config: Config, resolveID: ResolverID) {
     if (this._inputResolver) {
       // keyboard already shown
@@ -80,7 +109,7 @@ class KeyboardModule extends Module {
 
     const cameraDirection = [0, -0.1, -1];
     const cameraQuat = this._instance.getCameraQuaternion();
-    VRMath.rotateByQuaternion(cameraDirection, cameraQuat);
+    this.rotateByQuaternion(cameraDirection, cameraQuat);
     const cx = cameraDirection[0];
     const cy = cameraDirection[1];
     const cz = cameraDirection[2];
